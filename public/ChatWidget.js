@@ -82,12 +82,22 @@ export default class ChatWidget {
     
       if (!email) return;
     
-      await saveVisitor(this.session.sessionId, email);
-    
+      const response = await saveVisitor(
+        this.session.sessionId,
+        email
+      );
+      
+      this.session.sessionId = response.sessionId;
+      
+      localStorage.setItem(
+        "chat_session_id",
+        response.sessionId
+      );
+      
       localStorage.setItem("chat_email", email);
-    
+      
       showChatUI();
-    
+      
       await this.loadMessages({ full: true });
     });
 
