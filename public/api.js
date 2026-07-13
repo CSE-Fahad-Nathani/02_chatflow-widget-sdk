@@ -30,3 +30,18 @@ export async function getMessages(sessionId) {
 
   return response.json();
 }
+
+export async function saveVisitor(sessionId, email) {
+  const response = await fetch(`${BASE_URL}/visitor`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      sessionId,
+      email,
+    }),
+  });
+
+  return response.json();
+}

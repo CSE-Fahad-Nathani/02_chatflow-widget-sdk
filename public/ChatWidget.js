@@ -2,6 +2,7 @@ import {
   createSession,
   sendMessage,
   getMessages,
+  saveVisitor,
 } from "./api.js";
 import {
   createChatWindow,
@@ -41,6 +42,16 @@ export default class ChatWidget {
       "chat_session_id",
       this.session.sessionId
     );
+    let email = localStorage.getItem("chat_email");
+
+    if (!email) {
+      email = prompt("Please enter your email:");
+
+      if (email) {
+        await saveVisitor(this.session.sessionId, email);
+        localStorage.setItem("chat_email", email);
+      }
+    }
 
     this.config.title = this.session.config.title;
     this.config.color = this.session.config.primaryColor;
