@@ -286,3 +286,46 @@
     transition: opacity 0.15s ease;
   }
 }
+
+
+
+#my-chat-email {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+#my-chat-email p {
+  margin: 0;
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.5;
+}
+
+#my-chat-email-input {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+}
+
+#my-chat-email-input:focus {
+  border-color: var(--accent);
+}
+
+#my-chat-email-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#my-chat-email-btn:hover {
+  opacity: 0.9;
+}

@@ -4,11 +4,13 @@ import {
   getMessages,
   saveVisitor,
 } from "./api.js";
+
 import {
   createChatWindow,
   createButton,
   addMessage,
   renderMessages,
+  showChatUI,
 } from "./dom.js";
 
 export default class ChatWidget {
@@ -42,16 +44,6 @@ export default class ChatWidget {
       "chat_session_id",
       this.session.sessionId
     );
-    let email = localStorage.getItem("chat_email");
-
-    if (!email) {
-      email = prompt("Please enter your email:");
-
-      if (email) {
-        await saveVisitor(this.session.sessionId, email);
-        localStorage.setItem("chat_email", email);
-      }
-    }
 
     this.config.title = this.session.config.title;
     this.config.color = this.session.config.primaryColor;
@@ -66,13 +58,40 @@ export default class ChatWidget {
     );
 
     this.button = createButton(this.config.color, () => this.toggle());
-    await this.loadMessages({ full: true });
+
+    // If email already exists, show chat immediately
+    const savedEmail = localStorage.getItem("chat_email");
+
+    if (savedEmail) {
+      showChatUI();
+      await this.loadMessages({ full: true });
+    }
+
 
     this.attachEvents();
     this.startPolling();
   }
 
   attachEvents() {
+    // Email
+    const emailInput = document.getElementById("my-chat-email-input");
+    const emailBtn = document.getElementById("my-chat-email-btn");
+
+    emailBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+    
+      if (!email) return;
+    
+      await saveVisitor(this.session.sessionId, email);
+    
+      localStorage.setItem("chat_email", email);
+    
+      showChatUI();
+    
+      await this.loadMessages({ full: true });
+    });
+
+    // Chat
     const input = document.getElementById("my-chat-input");
     const sendBtn = document.getElementById("my-chat-send");
 
@@ -81,11 +100,12 @@ export default class ChatWidget {
 
       if (!message) return;
 
-      // Show message in UI
-      addMessage(message, "visitor", { forceScroll: true });
-      this.renderedMessageCount += 1;
+      addMessage(message, "visitor", {
+        forceScroll: true,
+      });
 
-      // Send to backend
+      this.renderedMessageCount++;
+
       const response = await sendMessage(
         this.session.sessionId,
         message
@@ -93,31 +113,36 @@ export default class ChatWidget {
 
       console.log("Message Response:", response);
 
-      // Clear input
       input.value = "";
     };
 
     input.addEventListener("keydown", async (event) => {
       if (event.key !== "Enter") return;
+
       await submit();
     });
 
     sendBtn.addEventListener("click", submit);
   }
 
-  // full=true does a full rebuild and forces scroll to the latest message
-  // (used on initial load and on opening the widget).
-  // Polling calls this with full=false so it only appends new messages
-  // and doesn't disturb wherever the user has scrolled to.
   async loadMessages({ full = false } = {}) {
     const response = await getMessages(this.session.sessionId);
+
     const allMessages = response.messages;
 
-    if (full || allMessages.length < this.renderedMessageCount) {
+    if (
+      full ||
+      allMessages.length < this.renderedMessageCount
+    ) {
       renderMessages(allMessages);
     } else {
-      const newMessages = allMessages.slice(this.renderedMessageCount);
-      newMessages.forEach((item) => addMessage(item.message, item.sender));
+      const newMessages = allMessages.slice(
+        this.renderedMessageCount
+      );
+
+      newMessages.forEach((item) =>
+        addMessage(item.message, item.sender)
+      );
     }
 
     this.renderedMessageCount = allMessages.length;
@@ -150,10 +175,15 @@ export default class ChatWidget {
   async toggle() {
     this.isOpen = !this.isOpen;
 
-    this.chatWindow.classList.toggle("my-chat-open", this.isOpen);
+    this.chatWindow.classList.toggle(
+      "my-chat-open",
+      this.isOpen
+    );
 
     if (this.isOpen) {
-      await this.loadMessages({ full: true });
+      await this.loadMessages({
+        full: true,
+      });
     }
   }
 }

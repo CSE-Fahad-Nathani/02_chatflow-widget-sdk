@@ -32,19 +32,41 @@ export function createChatWindow(title, sessionId, color, onClose) {
       </button>
     </div>
 
-    <div id="my-chat-body">
+    <div id="my-chat-body" style="display:none;">
       <div id="messages"></div>
     </div>
 
-    <div id="my-chat-footer">
+    <div id="my-chat-email">
+      <p style="margin:0 0 10px;font-size:14px;">
+        👋 Welcome! Please enter your email to start the chat.
+      </p>
+
+      <input
+        id="my-chat-email-input"
+        type="email"
+        placeholder="Enter your email"
+        autocomplete="email"
+      />
+
+      <button id="my-chat-email-btn">
+        Continue
+      </button>
+    </div>
+
+    <div id="my-chat-footer" style="display:none;">
       <input
         id="my-chat-input"
         placeholder="Type a message..."
         autocomplete="off"
       />
+
       <button id="my-chat-send" type="button" aria-label="Send message">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-          <path d="M1.5 8L14.5 1.5L9.5 14.5L7.5 9L1.5 8Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+          <path d="M1.5 8L14.5 1.5L9.5 14.5L7.5 9L1.5 8Z"
+            stroke="currentColor"
+            stroke-width="1.3"
+            stroke-linejoin="round"
+            stroke-linecap="round"/>
         </svg>
       </button>
     </div>
@@ -58,6 +80,12 @@ export function createChatWindow(title, sessionId, color, onClose) {
   }
 
   return chatWindow;
+}
+
+export function showChatUI() {
+  document.getElementById("my-chat-email").style.display = "none";
+  document.getElementById("my-chat-body").style.display = "block";
+  document.getElementById("my-chat-footer").style.display = "flex";
 }
 
 export function createButton(color, onClick) {
